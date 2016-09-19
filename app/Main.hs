@@ -1,6 +1,8 @@
 module Main where
 
-import Data.String.Strip
+import Repl
+
+import qualified Data.Map as M
 
 main :: IO ()
-main = interact strip
+main = repl M.empty
