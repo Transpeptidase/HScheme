@@ -15,7 +15,7 @@ eval (Var s) env = case M.lookup s env of
 eval a@(Int _) env = (Success a, env)
 eval a@(Double _) env = (Success a, env)
 eval a@(Bool _) env = (Success a, env)
-eval a@Clourse {} env = (Success a, env)
+eval a@Closure {} env = (Success a, env)
 
 eval (Define s ex) env =
   case fst (eval ex env) of
@@ -58,11 +58,11 @@ eval (BuiltInSinOpFunction s e) env =
 
 
 eval a@Function{} env =
-  (Success (Clourse env a), env)
+  (Success (Closure env a), env)
 
 eval (Call funcE args) env =
   case fst (eval funcE env) of
-    Success c@(Clourse fEnv (Function fname argnames body)) ->
+    Success c@(Closure fEnv (Function fname argnames body)) ->
       if length args /= length argnames
       then (Fail argNumDisMatch, env)
       else

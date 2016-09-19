@@ -19,7 +19,7 @@ data Expression = Var String
                 | IfElse Expression Expression Expression
                 | Function String [String] Expression
                 | Call Expression [Expression]
-                | Clourse Env Expression
+                | Closure Env Expression
                 | BuiltInBinOpFunction String Expression Expression
                 | BuiltInSinOpFunction String Expression
   deriving (Show, Eq)
@@ -31,7 +31,7 @@ data EvalRes = Success Expression
 
 
 toString :: Expression -> String
-toString (Clourse _ (Function name _ _)) = "#<procedure:" ++ name ++ ">"
+toString (Closure _ (Function name _ _)) = "#<procedure:" ++ name ++ ">"
 toString (Int a) = show a
 toString (Double a) = show a
 toString (Bool a) = if a then "true" else "false"
