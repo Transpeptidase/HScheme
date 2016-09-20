@@ -1,26 +1,12 @@
-module Repl where
+module Repl (repl) where
 
-import Eval
-import Expression
-import Parser
+import           Eval
+import           Expression
+import           Parser
 
-import qualified Data.Map as M
-import System.Exit (exitSuccess)
-import System.IO (hFlush, stdout)
-
--- repl :: String -> Env -> (EvalRes, Env)
--- repl s env =
---   case runParser parser s of
---     Right (a, []) -> eval a env
---     Right (_, x) -> (Fail ("Parser: has redundance characters \"" ++ x ++ "\""), env)
---     Left s -> (Fail ("Parser: " ++ s), env)
---
--- replStrList :: [String] -> [(EvalRes, Env)]
--- replStrList xs = aux xs M.empty
---   where
---     aux [] env = []
---     aux (x:xs) env = let a@(ans, e) = repl x env
---                      in a : aux xs e
+import qualified Data.Map    as M
+import           System.Exit (exitSuccess)
+import           System.IO   (hFlush, stdout)
 
 repl :: Env -> IO ()
 repl env = do
@@ -29,7 +15,7 @@ repl env = do
   s <- getLine
   if all (== ' ') s then repl env
   else if filter (/= ' ') s == "(exit)" then exitSuccess
-  else case runParser parser s of
+  else case parse s of
     Right (a, []) -> case eval a env of
       (Success a, newEnv) -> do
         putStrLn $ toString a

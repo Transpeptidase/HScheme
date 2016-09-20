@@ -1,6 +1,6 @@
 module BuiltIn (binOpLib, sinOpLib) where
 
-import Expression
+import           Expression
 
 arith _ op _ (Int a) (Int b) = Success $ Int (a `op` b)
 arith _ _ op (Int a) (Double b)  = Success $ Double (fromInteger a `op` b)
@@ -9,7 +9,7 @@ arith _ _ op (Double a) (Double b) = Success $ Double (a `op` b)
 arith name _ _ _ _ = Fail (name ++ " expected: Int or Double")
 
 add' = arith "add" (+) (+)
-sub' = arith "sub" (-) (+)
+sub' = arith "sub" (-) (-)
 mul' = arith "mul" (*) (*)
 div' = arith "div" div (/)
 

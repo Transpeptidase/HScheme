@@ -1,10 +1,10 @@
 module Eval where
 
-import BuiltIn
-import Expression
+import           BuiltIn
+import           Expression
 
-import qualified Data.Map as M
-import Data.List (find)
+import           Data.List  (find)
+import qualified Data.Map   as M
 
 eval :: Expression -> Env -> (EvalRes, Env)
 

@@ -8,7 +8,7 @@ HScheme is a simplified Scheme. There are some differences between them.
 
 * Primitive type: Int, Double, Bool
 
-* BuiltIn Functions:
+* BuiltIn Operators (they are not functions, so can't be passed and returned):
     * arith: +, -, *, /, %,
     * compare: =, !=, >, <, >=, <=
     * logic: ||, &&, !

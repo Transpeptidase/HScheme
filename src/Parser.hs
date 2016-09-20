@@ -1,5 +1,4 @@
-module Parser
- where
+module Parser (deleteComment, parse) where
 
 import           Control.Monad (ap, liftM, unless)
 import           Data.List     (foldr1)
@@ -83,7 +82,7 @@ operators = plus $oneOfChar "+-*/%<>=!"
 identifier :: Parser String
 identifier = do
   a <- oneOf [alphabet, char '_']
-  rest <- star (oneOf [alphabet, digit, char '_'])
+  rest <- star (oneOf [alphabet, digit, char '_', char '?', char '-'])
   return (a : rest)
 
 string :: String -> Parser ()
@@ -109,6 +108,7 @@ parseVarAndBool = do
   ide <- identifier
   case ide of
     "true" -> return (Bool True)
+    "else" -> return (Bool True)
     "false" -> return (Bool False)
     _ -> return (Var ide)
 
@@ -203,6 +203,13 @@ parseSinOp = do
   char ')'
   return (BuiltInSinOpFunction op args1)
 
+parseComment :: Parser ()
+parseComment = do
+  star space
+  char ';'
+  star (sta (/= '\n'))
+  star space
+  return ()
 
 parseList =
   [parseDouble, parseInt, parseDefineValue, parseDefineFunction, parseCond
@@ -215,3 +222,12 @@ parser = do
   x <- oneOf parseList
   star space
   return x
+
+deleteComment :: String -> String
+deleteComment s =
+  case runParser (star parseComment) s of
+    Right (_, rest) -> rest
+    _ -> error "Parser Comment"
+
+parse :: String -> Either String (Expression, String)
+parse = runParser parser
