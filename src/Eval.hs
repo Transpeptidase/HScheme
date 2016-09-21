@@ -1,10 +1,16 @@
-module Eval where
+module Eval (eval) where
 
 import           BuiltIn
 import           Expression
 
 import           Data.List  (find)
 import qualified Data.Map   as M
+
+isNotSuccess Success{} = False
+isNotSuccess _         = True
+
+getExpression (Success a) = a
+getExpression _ = error "can't get expression"
 
 eval :: Expression -> Env -> (EvalRes, Env)
 
@@ -16,7 +22,15 @@ eval a@(Int _) env = (Success a, env)
 eval a@(Double _) env = (Success a, env)
 eval a@(Bool _) env = (Success a, env)
 eval a@Closure {} env = (Success a, env)
+eval a@Char {} env = (Success a, env)
 
+eval (List xs') env =
+  let xs = map (\x -> fst (eval x env)) xs'
+  in case find isNotSuccess xs of
+    Nothing -> (Success (List (map getExpression xs)), env)
+    Just a@(Fail _) -> (a, env)
+    _  -> (Fail "Something be none", env)
+    
 eval (Define s ex) env =
   case fst (eval ex env) of
     a@(Success r) -> (None, M.insert s r env)
@@ -79,7 +93,5 @@ eval (Call funcE args) env =
           let funS = if null fname then "lambda function" else fname
           in funS ++ " : arity mismatch" ++ "\nexpected: " ++ show (length argnames)
              ++ "\ngiven: " ++ show (length args)
-        isNotSuccess Success{} = False
-        isNotSuccess _         = True
     a@Fail{} -> (a, env)
     _ -> (Fail "This expression is not a procedure", env)

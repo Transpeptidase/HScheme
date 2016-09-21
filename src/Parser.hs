@@ -77,7 +77,7 @@ alphabet :: Parser Char
 alphabet = oneOfChar "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 operators :: Parser String
-operators = plus $oneOfChar "+-*/%<>=!"
+operators = plus $oneOfChar "+-*/%<>=!|&:"
 
 identifier :: Parser String
 identifier = do
@@ -103,6 +103,13 @@ parseInt = do
   a <- digits
   return (Int (read (sign ++ a)))
 
+parseCharE :: Parser Expression
+parseCharE = do
+  char '\''
+  c <- sta (const True)
+  char '\''
+  return  (Char c)
+
 parseVarAndBool :: Parser Expression
 parseVarAndBool = do
   ide <- identifier
@@ -119,6 +126,21 @@ parseDouble = do
   char '.'
   b <- digits
   return (Double (read (sign ++ a ++ "." ++ b)))
+
+parseString :: Parser Expression
+parseString = do
+  char '"'
+  x <- star (sta (/= '"'))
+  char '"'
+  return $ List $ map Char x
+
+parseList :: Parser Expression
+parseList = do
+  char '['
+  star space
+  l <- star (parser >>= \x -> star space >> return x)
+  char ']'
+  return (List l)
 
 parseDefineValue :: Parser Expression
 parseDefineValue = do
@@ -211,15 +233,16 @@ parseComment = do
   star space
   return ()
 
-parseList =
-  [parseDouble, parseInt, parseDefineValue, parseDefineFunction, parseCond
-  ,parseVarAndBool, parseIfElse, parseLambda, parseCall
-  ,parseBinOp, parseSinOp]
+parseExpressionList =
+  [parseDouble, parseInt, parseCharE, parseDefineValue, parseDefineFunction
+  , parseString, parseList, parseCond
+  , parseVarAndBool, parseIfElse, parseLambda, parseCall
+  , parseBinOp, parseSinOp]
 
 parser :: Parser Expression
 parser = do
   star space
-  x <- oneOf parseList
+  x <- oneOf parseExpressionList
   star space
   return x
 

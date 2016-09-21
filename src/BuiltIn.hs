@@ -46,8 +46,28 @@ ge' = compare' ">=" (>=) (>=)
 le' = compare' "<=" (<=) (<=)
 ne' = compare' "!=" (/=) (/=)
 
+head' (List (x:_)) = Success x
+head' (List []) = Fail "head can't in null list"
+head' _ = Fail "head expected: List"
+
+tail' (List (_:xs)) = Success $ List xs
+tail' (List []) = Fail "tail can't in null list"
+tail' _ = Fail "tail expected: List"
+
+cons' x (List xs) = Success $ List (x : xs)
+cons' _ _ = Fail "cons expected: List"
+
+null' (List []) = Success (Bool True)
+null' (List _) = Success (Bool False)
+null' _ = Fail "null expected: List"
+
 binOpLib = [("+", add'), ("-", sub'), ("*", mul'), ("/", div'), ("%", mod')
           , ("&&", and'), ("||", or'), (">", g'), ("<", l'), ("=", e'), (">=", ge')
-          , ("<=", le'), ("!=", ne')]
+          , ("<=", le'), ("!=", ne')
+          , (":", cons')
+          ]
 
-sinOpLib = [("-", negate'), ("!", negate')]
+
+sinOpLib = [ ("-", negate'), ("!", not')
+           , ("<-", head'), ("->", tail'), ("><", null')
+           ]

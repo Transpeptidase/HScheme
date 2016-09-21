@@ -10,7 +10,11 @@ main :: IO ()
 main = do
   args <- getArgs
   if null args
-  then repl M.empty
+  then do
+    -- enter repl
+    putStrLn "Welcome to HScheme !"
+    repl M.empty
   else do
+    -- interpret file
     contents <- readFile $ head args
     interpret contents M.empty

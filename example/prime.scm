@@ -1,4 +1,3 @@
-; #lang racket
 
 (define (divide? a b)
   (= (% b a) 0))
@@ -15,7 +14,7 @@
 
 (define (prime? n)
   (= n (smallest-divisor n)))
-  
+
 ; test
 (prime? 1)
 (prime? 2)

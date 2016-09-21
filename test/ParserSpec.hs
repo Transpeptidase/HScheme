@@ -11,7 +11,7 @@ import Expression
 main :: IO ()
 main = hspec spec
 
-run = runParser parser
+run = parse
 
 ans x = Right (x, "")
 
