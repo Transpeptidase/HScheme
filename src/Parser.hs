@@ -176,6 +176,20 @@ parseCond = do
   char ')'
   return (Cond ans)
 
+parseLet :: Parser Expression
+parseLet = do
+  char '('
+  star space
+  string "let"
+  pairs <- inBracket $
+    star $ inBracket $ do
+      ide <- identifier
+      expression <- parser
+      return (ide, expression)
+  expression <- parser
+  char ')'
+  return (Let pairs expression)
+
 parseIfElse :: Parser Expression
 parseIfElse = do
   char '('
@@ -235,7 +249,7 @@ parseComment = do
 
 parseExpressionList =
   [parseDouble, parseInt, parseCharE, parseDefineValue, parseDefineFunction
-  , parseString, parseList, parseCond
+  , parseString, parseList, parseCond, parseLet
   , parseVarAndBool, parseIfElse, parseLambda, parseCall
   , parseBinOp, parseSinOp]
 

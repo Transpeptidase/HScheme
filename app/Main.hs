@@ -2,6 +2,7 @@ module Main where
 
 import Repl
 import Interpret
+import BasicLib
 
 import qualified Data.Map as M
 import System.Environment (getArgs)
@@ -13,8 +14,8 @@ main = do
   then do
     -- enter repl
     putStrLn "Welcome to HScheme !"
-    repl M.empty
+    repl initEnv
   else do
     -- interpret file
     contents <- readFile $ head args
-    interpret contents M.empty
+    interpret contents initEnv

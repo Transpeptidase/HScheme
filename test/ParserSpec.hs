@@ -71,3 +71,6 @@ spec = do
     it "SinOp" $ do
       run " (  ! true)" `shouldBe` ans (BuiltInSinOpFunction "!" (Bool True))
       run " (-  (if true 1 2))" `shouldBe` ans (BuiltInSinOpFunction "-" (IfElse (Bool True) (Int 1) (Int 2)))
+
+    it "Let" $ do
+      run "  ( let ( (  x 10  )( y h ) )1)" `shouldBe` ans (Let [("x", Int 10), ("y", Var "h")] (Int 1))

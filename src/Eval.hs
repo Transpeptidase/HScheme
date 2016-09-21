@@ -30,7 +30,8 @@ eval (List xs') env =
     Nothing -> (Success (List (map getExpression xs)), env)
     Just a@(Fail _) -> (a, env)
     _  -> (Fail "Something be none", env)
-    
+
+eval (Define s (Function "" a b)) env = eval (Define s (Function s a b)) env
 eval (Define s ex) env =
   case fst (eval ex env) of
     a@(Success r) -> (None, M.insert s r env)
@@ -49,6 +50,15 @@ eval (IfElse cond e1 e2) env =
     Success (Bool False) -> eval e2 env
     _  -> (Fail "If need Bool", env)
 
+eval (Let [] e) env = eval e env
+eval (Let ((x, Function "" a b):xs) e) env =
+  eval (Let ((x, Function x a b):xs) e) env
+eval (Let ((x, v):xs) e) env =
+  case fst (eval v env) of
+    a@(Success r) -> case fst (eval (Let xs e) (M.insert x r env)) of
+      a@(Success _) -> (a, env)
+      _ -> (a, env)
+    a -> (a, env)
 
 eval (BuiltInBinOpFunction s e1 e2) env =
   case lookup s binOpLib of
@@ -70,9 +80,7 @@ eval (BuiltInSinOpFunction s e) env =
       _        -> (Fail "Args can't be none", env)
     _ -> (Fail (s ++ ": undefined"), env)
 
-
-eval a@Function{} env =
-  (Success (Closure env a), env)
+eval a@Function{} env = (Success (Closure env a), env)
 
 eval (Call funcE args) env =
   case fst (eval funcE env) of

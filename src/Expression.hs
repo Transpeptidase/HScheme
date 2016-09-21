@@ -19,6 +19,7 @@ data Expression = Var String
                 | Define String Expression
                 | Cond [(Expression, Expression)]
                 | IfElse Expression Expression Expression
+                | Let [(String, Expression)] Expression
                 | Function String [String] Expression
                 | Call Expression [Expression]
                 | Closure Env Expression

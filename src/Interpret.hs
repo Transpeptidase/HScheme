@@ -1,4 +1,4 @@
-module Interpret (interpret) where
+module Interpret (interpret, interpret') where
 
 import Expression
 import Parser
@@ -7,21 +7,22 @@ import Eval
 import Control.Monad (mapM_)
 
 
-interpret' :: String -> Env -> [String]
-interpret' [] env = []
+interpret' :: String -> Env -> ([String], Env)
+interpret' [] env = ([], env)
 interpret' s env =
   case parse s of
     Right (a, []) -> case eval a env of
-      (Success a, newEnv) -> [toString a]
-      (None, newEnv) -> []
-      (Fail s, newEnv) -> [s]
+      (Success a, newEnv) -> ([toString a], newEnv)
+      (None, newEnv) -> ([], newEnv)
+      (Fail s, newEnv) -> ([s], newEnv)
 
     Right (a, x) -> case eval a env of
-      (Success a, newEnv) -> toString a : interpret' (deleteComment x) newEnv
+      (Success a, newEnv) -> let (y, e) = interpret' (deleteComment x) newEnv
+                             in (toString a : y, e)
       (None, newEnv) -> interpret' (deleteComment x) newEnv
-      (Fail s, newEnv) -> [s]
+      (Fail s, newEnv) -> ([s], newEnv)
 
-    Left s ->  ["Parser: " ++ s]
+    Left s ->  (["Parser: " ++ s], env)
 
 interpret :: String -> Env -> IO ()
-interpret codes env = mapM_ putStrLn (interpret' (deleteComment codes) env)
+interpret codes = mapM_ putStrLn . fst . interpret' (deleteComment codes)
